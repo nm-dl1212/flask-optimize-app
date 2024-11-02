@@ -1,4 +1,9 @@
 # usage
+
+`.env.template`をコピーして、`.env`を作成する。
+JWT_SECRET_KEYに任意のキーを設定する。
+
+以下コマンドでコンテナを立ち上げる。
 ```bash
 docker-compose up --build
 ```

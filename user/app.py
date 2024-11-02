@@ -5,14 +5,17 @@ from user_routes import user_blueprint
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'your_shared_secret_key')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # SQLiteデータベースを指定
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # blueprintの登録
 app.register_blueprint(user_blueprint, url_prefix='/user')
 
-# jwtmanagerの初期化
+# 環境変数からJWTのキーを取得。設定されていない場合はエラーを返す
+jwt_secret_key = os.environ.get('JWT_SECRET_KEY')
+if not jwt_secret_key:
+    raise ValueError("JWT_SECRET_KEY environment variable is not set")
+app.config['JWT_SECRET_KEY'] = jwt_secret_key
 jwt = JWTManager(app)
 
 # データベースの初期化

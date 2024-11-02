@@ -5,7 +5,7 @@ services:
     build:
       context: ./user
     environment:
-      - JWT_SECRET_KEY=your_shared_secret_key  # シークレットキーは各サービスで共有
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
       - "5001:5001"
 
@@ -13,7 +13,7 @@ services:
     build:
       context: ./dummy
     environment:
-      - JWT_SECRET_KEY=your_shared_secret_key # シークレットキーは各サービスで共有
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
       - "5002:5002"
     depends_on:
@@ -23,7 +23,7 @@ services:
     build:
       context: ./optimize
     environment:
-      - JWT_SECRET_KEY=your_shared_secret_key # シークレットキーは各サービスで共有
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
       - "5003:5003"
     depends_on:

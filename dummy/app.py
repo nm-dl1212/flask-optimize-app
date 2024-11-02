@@ -3,7 +3,12 @@ from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'default_secret_key')  
+
+# 環境変数からJWTのキーを取得。設定されていない場合はエラーを返す
+jwt_secret_key = os.environ.get('JWT_SECRET_KEY')
+if not jwt_secret_key:
+    raise ValueError("JWT_SECRET_KEY environment variable is not set")
+app.config['JWT_SECRET_KEY'] = jwt_secret_key
 jwt = JWTManager(app)
 
 @app.route('/dummyservice', methods=['POST'])
