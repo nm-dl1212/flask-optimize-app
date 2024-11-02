@@ -1,10 +1,12 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 from models import db
 from user_routes import user_blueprint
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # SQLiteデータベースを指定
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
