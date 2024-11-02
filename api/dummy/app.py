@@ -1,8 +1,10 @@
 import os
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # 環境変数からJWTのキーを取得。設定されていない場合はエラーを返す
 jwt_secret_key = os.environ.get('JWT_SECRET_KEY')
