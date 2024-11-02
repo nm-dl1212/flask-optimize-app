@@ -11,9 +11,9 @@ if not jwt_secret_key:
 app.config['JWT_SECRET_KEY'] = jwt_secret_key
 jwt = JWTManager(app)
 
-@app.route('/dummyservice', methods=['POST'])
+@app.route('/dummy', methods=['POST'])
 @jwt_required()
-def dummy_service():
+def dummy():
     current_user = get_jwt_identity()
     
     print("dummy_function")

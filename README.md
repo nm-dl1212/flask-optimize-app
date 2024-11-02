@@ -1,5 +1,4 @@
-# usage
-
+# 初期設定
 `.env.template`をコピーして、`.env`を作成する。
 JWT_SECRET_KEYに任意のキーを設定する。
 
@@ -8,7 +7,7 @@ JWT_SECRET_KEYに任意のキーを設定する。
 docker-compose up --build
 ```
 
-
+# 使用方法
 ```bash
 # ユーザーを作成
 curl -X POST http://localhost:5001/user/signup -H "Content-Type: application/json" -d '{"username": "user1", "password": "password1"}'
@@ -17,7 +16,7 @@ curl -X POST http://localhost:5001/user/signup -H "Content-Type: application/jso
 export TOKEN=$(curl -X POST http://localhost:5001/user/signin -H "Content-Type: application/json" -d '{"username": "user1", "password": "password1"}' | jq -r .access_token)
 
 # dummyAPIにリクエストを投げる
-curl -X POST http://localhost:5002/dummyservice -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"x1": 1, "x2":2}'
+curl -X POST http://localhost:5002/dummy -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"x1": 1, "x2":2}'
 
 # optimizeAPIにリクエストを投げ、dummyAPIの最小値を求める
 curl -X POST http://localhost:5003/optimize -H "Authorization: Bearer $TOKEN"
