@@ -20,7 +20,7 @@ def optimize():
 
         # dummyAPIにパラメータを送信
         response = requests.post(
-            'http://localhost:5001/dummyservice',  # dummyAPIのURL
+            'http://dummy_service:5002/dummyservice',  # dummyAPIのURL
             json={'x1': x1, 'x2': x2},
             headers={'Authorization': token}
         )
