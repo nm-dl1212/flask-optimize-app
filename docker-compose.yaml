@@ -3,7 +3,7 @@ version: '3.8'
 services:
   user_service:
     build:
-      context: ./user
+      context: ./api/user
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
@@ -11,22 +11,22 @@ services:
 
   dummy_service:
     build:
-      context: ./dummy
+      context: ./api/dummy
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
       - "5002:5002"
     depends_on:
-      - user_service  # DummyServiceがUserServiceに依存する
+      - user_service
 
   optimize_service:
     build:
-      context: ./optimize
+      context: ./api/optimize
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     ports:
       - "5003:5003"
     depends_on:
-      - user_service  # DummyServiceがUserServiceに依存する
+      - user_service
       - dummy_service
   
