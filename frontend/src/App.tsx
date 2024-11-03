@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
 
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Auth from './components/Auth';
-import Dummy from './components/Dummy';
-import Optimize from './components/Optimize';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Auth from "./components/Auth";
+import Dummy from "./components/Dummy";
+import Optimize from "./components/Optimize";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
     <>
@@ -41,7 +41,7 @@ function App() {
         </Routes>
       </Router>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

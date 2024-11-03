@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { dummyCalculation } from '../api/services';
+import React, { useState } from "react";
+import { dummyCalculation } from "../api/services";
 
 const Dummy: React.FC = () => {
   const [x1, setX1] = useState<number>(0);
@@ -14,8 +14,16 @@ const Dummy: React.FC = () => {
   return (
     <div>
       <h2>Dummy Calculation</h2>
-      <input type="number" placeholder="x1" onChange={(e) => setX1(Number(e.target.value))} />
-      <input type="number" placeholder="x2" onChange={(e) => setX2(Number(e.target.value))} />
+      <input
+        type="number"
+        placeholder="x1"
+        onChange={(e) => setX1(Number(e.target.value))}
+      />
+      <input
+        type="number"
+        placeholder="x2"
+        onChange={(e) => setX2(Number(e.target.value))}
+      />
       <button onClick={handleCalculate}>Calculate</button>
       {result !== null && <p>Result: {result}</p>}
     </div>
