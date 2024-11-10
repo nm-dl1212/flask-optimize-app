@@ -1,4 +1,5 @@
 import os
+import time
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from flask_cors import CORS
@@ -18,10 +19,10 @@ jwt = JWTManager(app)
 def dummy():
     current_user = get_jwt_identity()
     
-    print("dummy_function")
     x1 = request.json.get("x1")
     x2 = request.json.get("x2")
     y = x1**2 + x2*0.5
+    time.sleep(3) # ダミーの待ち時間
 
     return jsonify(msg=f"Hello, {current_user}. This is a dummy service response.", y=y), 200
 
