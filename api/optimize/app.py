@@ -1,7 +1,7 @@
 import os
 import optuna
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_jwt_extended import JWTManager, jwt_required
 
 app = Flask(__name__)
@@ -36,15 +36,25 @@ def optimize():
         else:
             return float('inf')  # エラーが発生した場合、高い値を返す
 
-    # Optunaのスタディ作成と最適化実行
-    study = optuna.create_study(direction='minimize')
-    study.optimize(objective, n_trials=50)
+   # ストリーミング応答を生成
+    @stream_with_context
+    def generate():
+        study = optuna.create_study(direction='minimize')
+        for trial in range(50):
+            study.optimize(objective, n_trials=1)  # 1回ずつ実行
+            
+            # 最新のデータ
+            latest_trial = study.trials[-1]
+            latest_x = latest_trial.params
+            latest_y= latest_trial.value
 
-    # 最適なパラメータと目的値を返す
-    return jsonify(
-        best_params=study.best_params,
-        best_value=study.best_value
-    ), 200
+            # これまでの最良値
+            best_x = study.best_params
+            best_y = study.best_value
+
+            yield f"{jsonify({'best_x': best_x, 'best_y': best_y, 'latest_x': latest_x, 'latest_y': latest_y}).get_data(as_text=True)}"
+
+    return Response(generate(), mimetype='text/event-stream')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5003)  # ポートは任意

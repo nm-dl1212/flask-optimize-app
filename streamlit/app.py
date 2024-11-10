@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import json
 import time
 
 # Set the backend URLs
@@ -61,19 +62,26 @@ if st.session_state['access_token']:
         if st.button("Optimize run"):
             headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
             
-            with st.status("Optimize running...", expanded=True) as status:
+            with st.status("Optimize running...", expanded=False) as status:
                 
                 try:
-                    response = requests.post(optimize_url, headers=headers)
-                    response_data = response.json()
-                    st.write("best y value:", response_data.get("best_value"))
-                    st.write("best x values:", response_data.get("best_params"))
-                    st.success(response_data.get("msg"), icon="✅")
+                    response = requests.post(optimize_url, headers=headers, stream=True)
+
+                    if response.status_code == 200:
+                        for line in response.iter_lines():
+                            decoded_line = line.decode('utf-8')
+                            response_data = json.loads(decoded_line)
+                            st.write(response_data)
+                        
+                        st.success(response_data.get("msg"), icon="✅")
+                    else:
+                        st.error("Failed to start optimization", icon="🔥")
+
                 except requests.exceptions.RequestException as e:
                     st.error("Failed to connect to the optimize server", icon="🔥")
 
                 status.update(
-                    label="Optimzie complete!", state="complete", expanded=True
+                    label="Optimize complete!", state="complete", expanded=False
                 )
 
     with tab3:
