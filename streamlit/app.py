@@ -5,6 +5,7 @@ import time
 # Set the backend URLs
 user_url = "http://localhost:5001/user"
 dummy_url = "http://localhost:5002/dummy"
+optimize_url = "http://localhost:5003/optimize"
 
 # Function to sign up a new user
 def signup(username, password):
@@ -36,7 +37,7 @@ if 'access_token' not in st.session_state:
 # Check if user is signed in
 if st.session_state['access_token']:
 
-    tab1, tab2 = st.tabs(["Dummy sevice", "User Setting"])
+    tab1, tab2, tab3 = st.tabs(["Dummy", "Optimization", "UserSetting"])
 
     with tab1:
         x1 = st.number_input("Enter value for x1:", value=0.0, )
@@ -50,12 +51,32 @@ if st.session_state['access_token']:
             try:
                 response = requests.post(dummy_url, json=data, headers=headers)
                 response_data = response.json()
-                st.write("Message:", response_data.get("msg"))
                 st.write("Calculated y value:", response_data.get("y"))
+                st.success(response_data.get("msg"), icon="✅")
             except requests.exceptions.RequestException as e:
-                st.error("Failed to connect to the backend.")
+                st.error("Failed to connect to the dummy server", icon="🔥")
 
     with tab2:
+        # Button to send request to the /optimize endpoint
+        if st.button("Optimize run"):
+            headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
+            
+            with st.status("Optimize running...", expanded=True) as status:
+                
+                try:
+                    response = requests.post(optimize_url, headers=headers)
+                    response_data = response.json()
+                    st.write("best y value:", response_data.get("best_value"))
+                    st.write("best x values:", response_data.get("best_params"))
+                    st.success(response_data.get("msg"), icon="✅")
+                except requests.exceptions.RequestException as e:
+                    st.error("Failed to connect to the optimize server", icon="🔥")
+
+                status.update(
+                    label="Optimzie complete!", state="complete", expanded=True
+                )
+
+    with tab3:
         # Log out button
         if st.button("Log Out"):
             st.session_state['access_token'] = None
