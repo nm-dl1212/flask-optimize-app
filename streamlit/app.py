@@ -68,10 +68,12 @@ if st.session_state['access_token']:
                     response = requests.post(optimize_url, headers=headers, stream=True)
 
                     if response.status_code == 200:
+                        res_space = st.empty()
                         for line in response.iter_lines():
                             decoded_line = line.decode('utf-8')
                             response_data = json.loads(decoded_line)
-                            st.write(response_data)
+                            with res_space.container():
+                                st.write(response_data)
                         
                         st.success(response_data.get("msg"), icon="✅")
                     else:
@@ -81,7 +83,7 @@ if st.session_state['access_token']:
                     st.error("Failed to connect to the optimize server", icon="🔥")
 
                 status.update(
-                    label="Optimize complete!", state="complete", expanded=False
+                    label="Optimize complete!", state="complete", expanded=True
                 )
 
     with tab3:

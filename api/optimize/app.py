@@ -40,19 +40,30 @@ def optimize():
     @stream_with_context
     def generate():
         study = optuna.create_study(direction='minimize')
-        for trial in range(50):
+        for i in range(50):
             study.optimize(objective, n_trials=1)  # 1回ずつ実行
             
             # 最新のデータ
             latest_trial = study.trials[-1]
-            latest_x = latest_trial.params
-            latest_y= latest_trial.value
 
             # これまでの最良値
-            best_x = study.best_params
-            best_y = study.best_value
+            best_trial = study.best_trial
 
-            yield f"{jsonify({'best_x': best_x, 'best_y': best_y, 'latest_x': latest_x, 'latest_y': latest_y}).get_data(as_text=True)}"
+            response_json = jsonify(
+                {
+                    'best': {
+                        'number': best_trial.number,
+                        'params': best_trial.params,
+                        'value': best_trial.value
+                    }, 
+                    'latest': {
+                        'number': latest_trial.number,
+                        'params': latest_trial.params,
+                        'value': latest_trial.value
+                    }
+                }
+            )
+            yield f"{response_json.get_data(as_text=True)}"
 
     return Response(generate(), mimetype='text/event-stream')
 
