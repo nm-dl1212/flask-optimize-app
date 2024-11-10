@@ -4,6 +4,7 @@ from flask_cors import CORS
 from models import db
 from user_routes import user_blueprint
 from flask_jwt_extended import JWTManager
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -18,6 +19,11 @@ jwt_secret_key = os.environ.get('JWT_SECRET_KEY')
 if not jwt_secret_key:
     raise ValueError("JWT_SECRET_KEY environment variable is not set")
 app.config['JWT_SECRET_KEY'] = jwt_secret_key
+
+# jwtの有効期限
+expire_seconds = os.environ.get('JWT_EXPIRE_SECONDS')
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(seconds=int(expire_seconds))
+
 jwt = JWTManager(app)
 
 # データベースの初期化
