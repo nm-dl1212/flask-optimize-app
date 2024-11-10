@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import time
 
 # Set the backend URLs
 user_url = "http://localhost:5001/user"
@@ -34,35 +35,38 @@ if 'access_token' not in st.session_state:
 
 # Check if user is signed in
 if st.session_state['access_token']:
-    # Dummy Service Screen
-    st.header("Dummy Service")
-    x1 = st.number_input("Enter value for x1:", value=0.0)
-    x2 = st.number_input("Enter value for x2:", value=0.0)
 
-    # Button to send request to the /dummy endpoint
-    if st.button("Send Request"):
-        headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
-        data = {"x1": x1, "x2": x2}
-        
-        try:
-            response = requests.post(dummy_url, json=data, headers=headers)
-            response_data = response.json()
-            st.write("Message:", response_data.get("msg"))
-            st.write("Calculated y value:", response_data.get("y"))
-        except requests.exceptions.RequestException as e:
-            st.error("Failed to connect to the backend.")
+    tab1, tab2 = st.tabs(["Dummy sevice", "User Setting"])
 
-    # Log out button
-    if st.button("Log Out"):
-        st.session_state['access_token'] = None
-        st.rerun()  # Reload the app to show the login screen
+    with tab1:
+        x1 = st.number_input("Enter value for x1:", value=0.0, )
+        x2 = st.number_input("Enter value for x2:", value=0.0)
 
-    if st.button("Delete User"):
-        delete_response = delete_user(st.session_state["access_token"])
-        st.write(delete_response)
-        st.session_state['access_token'] = None
-        st.rerun()  # Reload the app to show the login screen
-        
+        # Button to send request to the /dummy endpoint
+        if st.button("Send Request"):
+            headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
+            data = {"x1": x1, "x2": x2}
+            
+            try:
+                response = requests.post(dummy_url, json=data, headers=headers)
+                response_data = response.json()
+                st.write("Message:", response_data.get("msg"))
+                st.write("Calculated y value:", response_data.get("y"))
+            except requests.exceptions.RequestException as e:
+                st.error("Failed to connect to the backend.")
+
+    with tab2:
+        # Log out button
+        if st.button("Log Out"):
+            st.session_state['access_token'] = None
+            st.rerun()  # Reload the app to show the login screen
+
+        if st.button("Delete User"):
+            delete_response = delete_user(st.session_state["access_token"])
+            st.write(delete_response)
+            st.session_state['access_token'] = None
+            st.rerun()  # Reload the app to show the login screen
+            
 else:
     # Login Screen with Tabs
     tab1, tab2 = st.tabs(["Sign Up", "Sign In"])
