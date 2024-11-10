@@ -28,8 +28,12 @@ def delete_user(access_token):
 # Streamlit app title
 st.title("User Management and Dummy Service Client")
 
+# initialize session_state for token
+if 'access_token' not in st.session_state:
+    st.session_state['access_token'] = None
+
 # Check if user is signed in
-if "access_token" in st.session_state:
+if st.session_state['access_token']:
     # Dummy Service Screen
     st.header("Dummy Service")
     x1 = st.number_input("Enter value for x1:", value=0.0)
@@ -50,13 +54,13 @@ if "access_token" in st.session_state:
 
     # Log out button
     if st.button("Log Out"):
-        st.session_state.pop("access_token", None)  # Reset the access token
+        st.session_state['access_token'] = None
         st.rerun()  # Reload the app to show the login screen
 
     if st.button("Delete User"):
         delete_response = delete_user(st.session_state["access_token"])
         st.write(delete_response)
-        st.session_state.pop("access_token", None)  # reset access token
+        st.session_state['access_token'] = None
         st.rerun()  # Reload the app to show the login screen
         
 else:
