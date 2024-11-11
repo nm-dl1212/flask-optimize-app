@@ -20,7 +20,7 @@ def dummy():
     x1 = request.json.get("x1")
     x2 = request.json.get("x2")
     y = x1**2 + x2*0.5
-    time.sleep(0.5) # ダミーの待ち時間
+    time.sleep(0.2) # ダミーの待ち時間
 
     return jsonify(msg=f"Hello, {current_user}. This is a dummy service response.", y=y), 200
 

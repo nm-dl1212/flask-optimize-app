@@ -29,7 +29,7 @@ def delete_user(access_token):
 # -------------------------
 
 # Streamlit app title
-st.title("User Management and Dummy Service Client")
+st.title("Optimize Service Client")
 
 # initialize session_state for token
 if 'access_token' not in st.session_state:
