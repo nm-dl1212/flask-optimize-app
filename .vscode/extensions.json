@@ -1,8 +1,7 @@
 {
     "recommendations": [
-      "dbaeumer.vscode-eslint",
-      "esbenp.prettier-vscode",
-      "usernamehw.errorlens",
+      "ms-python.python",
+      "ms-python.debugpy",
+      "ms-python.black-formatter",
     ]
-}
-  
+}wata
