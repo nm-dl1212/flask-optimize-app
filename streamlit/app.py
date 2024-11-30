@@ -2,23 +2,31 @@ import streamlit as st
 import requests
 import json
 import time
+import os
 
 # Set the backend URLs
-user_url = "http://localhost:5001/user"
-dummy_url = "http://localhost:5002/dummy"
-optimize_url = "http://localhost:5003/optimize"
+user_url = os.environ["USER_URL"]  # "http://localhost:5001/user"
+dummy_url = os.environ["DUMMY_URL"]  # "http://localhost:5002/dummy"
+optimize_url = os.environ["OPTIMIZE_URL"]  # "http://localhost:5003/optimize"
+
 
 # Function to sign up a new user
 def signup(username, password):
-    response = requests.post(f"{user_url}/signup", json={"username": username, "password": password})
+    response = requests.post(
+        f"{user_url}/signup", json={"username": username, "password": password}
+    )
     return response.json()
+
 
 # Function to sign in and get JWT token
 def signin(username, password):
-    response = requests.post(f"{user_url}/signin", json={"username": username, "password": password})
+    response = requests.post(
+        f"{user_url}/signin", json={"username": username, "password": password}
+    )
     if response.status_code == 200:
         return response.json().get("access_token")
     return None
+
 
 # Function to delete the user
 def delete_user(access_token):
@@ -26,29 +34,33 @@ def delete_user(access_token):
     response = requests.delete(f"{user_url}/delete_user", headers=headers)
     return response.json()
 
+
 # -------------------------
 
 # Streamlit app title
 st.title("Optimize Service Client")
 
 # initialize session_state for token
-if 'access_token' not in st.session_state:
-    st.session_state['access_token'] = None
+if "access_token" not in st.session_state:
+    st.session_state["access_token"] = None
 
 # Check if user is signed in
-if st.session_state['access_token']:
+if st.session_state["access_token"]:
 
     tab1, tab2, tab3 = st.tabs(["Dummy", "Optimization", "UserSetting"])
 
     with tab1:
-        x1 = st.number_input("Enter value for x1:", value=0.0, )
+        x1 = st.number_input(
+            "Enter value for x1:",
+            value=0.0,
+        )
         x2 = st.number_input("Enter value for x2:", value=0.0)
 
         # Button to send request to the /dummy endpoint
         if st.button("Send Request"):
             headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
             data = {"x1": x1, "x2": x2}
-            
+
             try:
                 response = requests.post(dummy_url, json=data, headers=headers)
                 response_data = response.json()
@@ -61,20 +73,20 @@ if st.session_state['access_token']:
         # Button to send request to the /optimize endpoint
         if st.button("Optimize run"):
             headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
-            
+
             with st.status("Optimize running...", expanded=False) as status:
-                
+
                 try:
                     response = requests.post(optimize_url, headers=headers, stream=True)
 
                     if response.status_code == 200:
                         res_space = st.empty()
                         for line in response.iter_lines():
-                            decoded_line = line.decode('utf-8')
+                            decoded_line = line.decode("utf-8")
                             response_data = json.loads(decoded_line)
                             with res_space.container():
                                 st.write(response_data)
-                        
+
                         st.success(response_data.get("msg"), icon="✅")
                     else:
                         st.error("Failed to start optimization", icon="🔥")
@@ -89,15 +101,15 @@ if st.session_state['access_token']:
     with tab3:
         # Log out button
         if st.button("Log Out"):
-            st.session_state['access_token'] = None
+            st.session_state["access_token"] = None
             st.rerun()  # Reload the app to show the login screen
 
         if st.button("Delete User"):
             delete_response = delete_user(st.session_state["access_token"])
             st.write(delete_response)
-            st.session_state['access_token'] = None
+            st.session_state["access_token"] = None
             st.rerun()  # Reload the app to show the login screen
-            
+
 else:
     # Login Screen with Tabs
     tab1, tab2 = st.tabs(["Sign Up", "Sign In"])

@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+
+  streamlit:
+    build:
+      context: ./streamlit
+    environment:
+      - USER_URL=http://user_service:5001/user
+      - DUMMY_URL=http://dummy_service:5002/dummy
+      - OPTIMIZE_URL=http://optimize_service:5003/optimize
+    ports:
+      - "8501:8501"
+
   user_service:
     build:
       context: ./api/user
