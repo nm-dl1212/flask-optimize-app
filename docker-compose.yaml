@@ -36,6 +36,7 @@ services:
       context: ./api/optimize
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - DUMMY_URL=http://dummy_service:5002/dummy
     ports:
       - "5003:5003"
     depends_on:
