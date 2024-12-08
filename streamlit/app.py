@@ -3,6 +3,7 @@ import requests
 import json
 import time
 import os
+import plotly.graph_objects as go
 
 # Set the backend URLs
 user_url = os.environ["USER_URL"]  # "http://localhost:5001/user"
@@ -60,6 +61,7 @@ if st.session_state["access_token"]:
             data = {"x1": x1, "x2": x2}
 
             try:
+                # ダミーAPIにリクエスト
                 response = requests.post(dummy_url, json=data, headers=headers)
                 if response.status_code == 200:
                     response_data = response.json()
@@ -77,22 +79,58 @@ if st.session_state["access_token"]:
                 st.error("Failed to connect to the dummy server", icon="📡⚡️")
 
     with tab2:
-        # Button to send request to the /optimize endpoint
+        st.write("input: ")
+        max_iteration = st.number_input("max_iteration:", value=10)
+
         if st.button("Optimize run"):
             headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
+            data = {"max_iteration": max_iteration}
 
             with st.status("Running...", expanded=False) as status:
 
                 try:
-                    response = requests.post(optimize_url, headers=headers, stream=True)
+                    # 最適化APIにリクエスト
+                    response = requests.post(
+                        optimize_url, json=data, headers=headers, stream=True
+                    )
 
                     if response.status_code == 200:
-                        res_space = st.empty()
+                        response_placeholder = st.empty()
+
+                        data_n = []
+                        data_y = []
+                        fig = go.Figure()
+                        fig.add_trace(
+                            go.Scatter(
+                                x=data_n,
+                                y=data_y,
+                                mode="lines+markers",
+                                name="リアルタイムデータ",
+                            )
+                        )
+                        plot_placeholder = st.plotly_chart(
+                            fig, use_container_width=True
+                        )
+
                         for line in response.iter_lines():
-                            decoded_line = line.decode("utf-8")
-                            response_data = json.loads(decoded_line)
-                            with res_space.container():
-                                st.write(response_data)
+                            if line:
+                                decoded_line = line.decode("utf-8")
+                                response_data = json.loads(decoded_line)
+                                with response_placeholder.container():
+                                    st.write(response_data)
+
+                                    # グラフに追加していく
+                                    new_n = response_data.get("latest").get("number")
+                                    new_y = response_data.get("latest").get("value")
+                                    data_n.append(new_n)
+                                    data_y.append(new_y)
+
+                                    # グラフに埋め込む
+                                    fig.data[0].x = data_n
+                                    fig.data[0].y = data_y
+                                    plot_placeholder.plotly_chart(
+                                        fig, use_container_width=True
+                                    )
 
                         st.success("Optimizaion complete", icon="✅")
 
