@@ -50,31 +50,38 @@ if st.session_state["access_token"]:
     tab1, tab2, tab3 = st.tabs(["Dummy", "Optimization", "UserSetting"])
 
     with tab1:
-        x1 = st.number_input(
-            "Enter value for x1:",
-            value=0.0,
-        )
-        x2 = st.number_input("Enter value for x2:", value=0.0)
+        st.write("input: ")
+        x1 = st.number_input("x1:", value=0.0)
+        x2 = st.number_input("x2:", value=0.0)
 
         # Button to send request to the /dummy endpoint
-        if st.button("Send Request"):
+        if st.button("Calculate"):
             headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
             data = {"x1": x1, "x2": x2}
 
             try:
                 response = requests.post(dummy_url, json=data, headers=headers)
-                response_data = response.json()
-                st.write("Calculated y value:", response_data.get("y"))
-                st.success(response_data.get("msg"), icon="✅")
+                if response.status_code == 200:
+                    response_data = response.json()
+                    st.write("Calculated y value:", response_data.get("y"))
+                    st.success(response_data.get("msg"), icon="✅")
+
+                else:
+                    response_data = response.json()
+                    st.error(
+                        f'ERROR code:{response.status_code}  msg:{response_data.get("msg")}',
+                        icon="🔥",
+                    )
+
             except requests.exceptions.RequestException as e:
-                st.error("Failed to connect to the dummy server", icon="🔥")
+                st.error("Failed to connect to the dummy server", icon="📡⚡️")
 
     with tab2:
         # Button to send request to the /optimize endpoint
         if st.button("Optimize run"):
             headers = {"Authorization": f"Bearer {st.session_state['access_token']}"}
 
-            with st.status("Optimize running...", expanded=False) as status:
+            with st.status("Running...", expanded=False) as status:
 
                 try:
                     response = requests.post(optimize_url, headers=headers, stream=True)
@@ -87,16 +94,19 @@ if st.session_state["access_token"]:
                             with res_space.container():
                                 st.write(response_data)
 
-                        st.success(response_data.get("msg"), icon="✅")
+                        st.success("Optimizaion complete", icon="✅")
+
                     else:
-                        st.error("Failed to start optimization", icon="🔥")
+                        response_data = response.json()
+                        st.error(
+                            f'ERROR  code:{response.status_code}  msg:{response_data.get("msg")}',
+                            icon="🔥",
+                        )
 
                 except requests.exceptions.RequestException as e:
-                    st.error("Failed to connect to the optimize server", icon="🔥")
+                    st.error("Failed to connect to the optimize server", icon="📡⚡️")
 
-                status.update(
-                    label="Optimize complete!", state="complete", expanded=True
-                )
+                status.update(label="Complete!!!", state="complete", expanded=True)
 
     with tab3:
         # Log out button
@@ -105,10 +115,16 @@ if st.session_state["access_token"]:
             st.rerun()  # Reload the app to show the login screen
 
         if st.button("Delete User"):
-            delete_response = delete_user(st.session_state["access_token"])
-            st.write(delete_response)
-            st.session_state["access_token"] = None
-            st.rerun()  # Reload the app to show the login screen
+            response = delete_user(st.session_state["access_token"])
+            if response == 200:
+                st.success(response, icon="✅")
+                st.session_state["access_token"] = None
+                st.rerun()  # Reload the app to show the login screen
+            else:
+                st.error(
+                    f'ERROR  code:{response.status_code}  msg:{response_data.get("msg")}',
+                    icon="🔥",
+                )
 
 else:
     # Login Screen with Tabs
