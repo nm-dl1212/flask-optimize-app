@@ -95,21 +95,27 @@ if st.session_state["access_token"]:
                     )
 
                     if response.status_code == 200:
-                        response_placeholder = st.empty()
 
+                        response_placeholder = st.empty()
                         data_n = []
+                        data_x = []
                         data_y = []
-                        fig = go.Figure()
-                        fig.add_trace(
+                        fig_plot = go.Figure()
+                        fig_plot.add_trace(
                             go.Scatter(
                                 x=data_n,
                                 y=data_y,
                                 mode="lines+markers",
-                                name="リアルタイムデータ",
+                                name="real-time data",
                             )
                         )
                         plot_placeholder = st.plotly_chart(
-                            fig, use_container_width=True
+                            fig_plot, use_container_width=True, key="plot"
+                        )
+
+                        fig_performance = go.Figure()
+                        performance_placeholder = st.plotly_chart(
+                            fig_plot, use_container_width=True, key="performance"
                         )
 
                         for line in response.iter_lines():
@@ -119,17 +125,35 @@ if st.session_state["access_token"]:
                                 with response_placeholder.container():
                                     st.write(response_data)
 
-                                    # グラフに追加していく
-                                    new_n = response_data.get("latest").get("number")
-                                    new_y = response_data.get("latest").get("value")
-                                    data_n.append(new_n)
-                                    data_y.append(new_y)
+                                new_n = response_data.get("latest").get("number")
+                                new_x = list(
+                                    response_data.get("latest").get("params").values()
+                                )
+                                new_y = response_data.get("latest").get("value")
+                                keys = list(
+                                    response_data.get("latest").get("params").keys()
+                                ) + ["y"]
+                                data_n.append(new_n)
+                                data_x.append(new_x)
+                                data_y.append(new_y)
 
-                                    # グラフに埋め込む
-                                    fig.data[0].x = data_n
-                                    fig.data[0].y = data_y
+                                with plot_placeholder.container():
+                                    fig_plot.data[0].x = data_n
+                                    fig_plot.data[0].y = data_y
                                     plot_placeholder.plotly_chart(
-                                        fig, use_container_width=True
+                                        fig_plot, use_container_width=True
+                                    )
+                                with performance_placeholder.container():
+                                    performance_placeholder.plotly_chart(
+                                        fig_performance.add_trace(
+                                            go.Scatter(
+                                                x=keys,
+                                                y=new_x + [new_y],
+                                                mode="lines+markers",
+                                                name="performance",
+                                            )
+                                        ),
+                                        use_container_width=True,
                                     )
 
                         st.success("Optimizaion complete", icon="✅")
