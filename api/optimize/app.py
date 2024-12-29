@@ -24,6 +24,8 @@ jwt = JWTManager(app)
 def optimize():
     token = request.headers.get("Authorization")  # JWTトークンをヘッダーから取得
 
+    max_iteration = request.json.get("max_iteration")
+
     # Optunaの目的関数
     def objective(trial):
         x1 = trial.suggest_uniform("x1", -10, 10)
@@ -46,7 +48,7 @@ def optimize():
     @stream_with_context
     def generate():
         study = optuna.create_study(direction="minimize")
-        for i in range(50):
+        for i in range(max_iteration):
             # optunaの最適化を実行
             study.optimize(objective, n_trials=1)  # 1回ずつ実行
 

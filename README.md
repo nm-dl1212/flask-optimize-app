@@ -81,4 +81,11 @@ kubectl describe secret jwt-secret -n opt-app
 
 # デプロイ
 kubectl apply -f k8s/user-service-deployment.yaml,k8s/dummy-service-deployment.yaml,k8s/optimize-service-deployment.yaml,k8s/streamlit-service-deployment.yaml -n opt-app
+
+
+# サービスにポートフォワード
+kubectl port-forward svc/streamlit 30001:8501 -n opt-app
+
+# 削除
+kubectl delete ns opt-app
 ```
