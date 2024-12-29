@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dummy-service
+  labels:
+    app: dummy-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dummy-service
+  template:
+    metadata:
+      labels:
+        app: dummy-service
+    spec:
+      containers:
+      - name: dummy-service
+        image: docker.io/library/dummy-service:latest  # Dockerfileのビルドイメージ名
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5002
+        env:
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: secret-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dummy-service
+spec:
+  ports:
+  - port: 5002
+    targetPort: 5002
+  selector:
+    app: dummy-service

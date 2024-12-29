@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamlit
+  labels:
+    app: streamlit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamlit
+  template:
+    metadata:
+      labels:
+        app: streamlit
+    spec:
+      containers:
+      - name: streamlit
+        image: docker.io/library/streamlit-service:latest  # Dockerfileのビルドイメージ名
+        imagePullPolicy: IfNotPresentm
+        ports:
+        - containerPort: 8501
+        env:
+        - name: USER_URL
+          value: "http://user-service:5001/user"
+        - name: DUMMY_URL
+          value: "http://dummy-service:5002/dummy"
+        - name: OPTIMIZE_URL
+          value: "http://optimize-service:5003/optimize"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamlit
+spec:
+  type: NodePort
+  ports:
+  - port: 8501
+    targetPort: 8501
+    nodePort: 30001
+  selector:
+    app: streamlit

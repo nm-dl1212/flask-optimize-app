@@ -54,3 +54,31 @@ curl -X POST http://localhost:5002/dummy -H "Authorization: Bearer $TOKEN" -H "C
 # optimizeAPIにリクエストを投げ、dummyAPIの最小値を求める
 curl -X POST http://localhost:5003/optimize -H "Authorization: Bearer $TOKEN"
 ```
+
+
+
+# kubernetes
+
+```bash
+# minikubeを起動
+minikube start
+eval $(minikube docker-env)
+
+
+# コンテナをビルド
+docker build -t streamlit-service streamlit/
+docker build -t user-service api/user/
+docker build -t dummy-service api/dummy/
+docker build -t optimize-service api/optimize/
+
+
+# 名前空間
+kubectl create namespace opt-app
+
+# シークレットを登録
+kubectl apply -f k8s/jwt-secret.yaml -n opt-app
+kubectl describe secret jwt-secret -n opt-app
+
+# デプロイ
+kubectl apply -f k8s/user-service-deployment.yaml,k8s/dummy-service-deployment.yaml,k8s/optimize-service-deployment.yaml,k8s/streamlit-service-deployment.yaml -n opt-app
+```

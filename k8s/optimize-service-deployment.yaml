@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: optimize-service
+  labels:
+    app: optimize-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: optimize-service
+  template:
+    metadata:
+      labels:
+        app: optimize-service
+    spec:
+      containers:
+      - name: optimize-service
+        image: docker.io/library/optimize-service:latest  # Dockerfileのビルドイメージ名
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5003
+        env:
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: secret-key
+        - name: DUMMY_URL
+          value: "http://dummy-service:5002/dummy"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: optimize-service
+spec:
+  ports:
+  - port: 5003
+    targetPort: 5003
+  selector:
+    app: optimize-service
