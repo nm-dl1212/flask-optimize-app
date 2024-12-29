@@ -17,7 +17,7 @@ spec:
       containers:
       - name: streamlit
         image: docker.io/library/streamlit-service:latest  # Dockerfileのビルドイメージ名
-        imagePullPolicy: IfNotPresentm
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8501
         env:
